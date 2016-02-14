@@ -1,18 +1,20 @@
 #!/usr/bin/env bash
 
+date=$(date "+%Y-%m-%dT%H:%M:%S")
 {
-source catalog.sh
 
+source catalogs.sh
+
+echo ">>>>: Starting backup. Destination dir: '${dest}'"
 
 for src in "${srcs[@]}"
 do
-    echo "$src"
+    echo ">>>>: Starting backup of: ${src}"
+    #rsync -vaRE --progress "${src}" "${dest}"
+    rsync -vaRE "${src}" "${dest}"
+    echo ">>>>: Succesfull backup of: ${src}"
 done
 
-#rsync -vaRE --progress "${src}" "${dest}"
+echo ">>>>: BACKUP DONE!"
 
-
-
-
-
-} 2> >(tee errors.txt) | tee log.txt
+} 2> >(tee errors-${date}.txt) | tee log-${date}.txt
