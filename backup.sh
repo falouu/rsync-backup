@@ -6,6 +6,7 @@ date=$(date "+%Y-%m-%dT%H:%M:%S")
 source catalogs.sh
 
 echo ">>>>: Starting backup. Destination dir: '${dest}'"
+mkdir -p "${dest}"
 
 for src in "${srcs[@]}"
 do
