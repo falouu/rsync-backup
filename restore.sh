@@ -46,18 +46,19 @@ then
 fi
 
 echo ">>>>: restoring '$src'. Restored copy will be saved in '${restored_dir}'"
-rsync -vaRE --omit-dir-times "${src}" "${rdest}"
-
-exit_code="$?"
-if [[ "${exit_code}" != 0 ]]
-then
-	echo ">>>>: Restoring failed! O_o. Rsync exit code: ${exit_code}. Aborting..." 1>&2
-	exit 1
-fi
-
-echo ">>>>: restoring completed."
 
 if [ "${no_restored_copy}" != "true" ]; then
+	rsync -vaRE --omit-dir-times "${src}" "${rdest}"
+
+	exit_code="$?"
+	if [[ "${exit_code}" != 0 ]]
+	then
+		echo ">>>>: Restoring failed! O_o. Rsync exit code: ${exit_code}. Aborting..." 1>&2
+		exit 1
+	fi
+
+	echo ">>>>: restoring completed."
+
 	echo ">>>>: Saving restored copy..."
 	rsync -vaRE "$src" "${restored_dir}"
 
@@ -67,11 +68,16 @@ if [ "${no_restored_copy}" != "true" ]; then
 		echo ">>>>: Saving Restored copy failed ! O_o. Aborting..." 1>&2
 		exit 1
 	fi
+
+	echo ">>>>: deleting restored files from backup..."
+	rm -rf "$src"
 else
 	echo ">>>>: Don't saving restored copy - as requested"
+	echo ">>>>: Moving files..."
+	sdir=$(dirname "$src")
+	mv "${src}" "${rdest}/${sdir}"
+	echo ">>>>: restoring completed."
 fi
 
-echo ">>>>: deleting restored files from backup..."
-rm -rf "$src"
 
 } 2> >(tee "${DIR}/restoring-errors-${date}.txt") | tee "${DIR}/restoring-log-${date}.txt"
